@@ -2,16 +2,16 @@
 CC=gcc
 CFLAGS=-Wall
 
-all: temper
+all: aprstemper
 
-temper: temper.c pcsensor.c pcsensor.h
-	$(CC) $(CFLAGS) temper.c pcsensor.c -o temper -lusb
+aprstemper: temper.c pcsensor.c pcsensor.h
+	$(CC) $(CFLAGS) temper.c pcsensor.c -o aprstemper -lusb
 
 clean:
-	rm temper
+	rm aprstemper
 
 install:
-	install temper /usr/local/bin
+	install aprstemper /usr/local/bin
 
 uninstall:
-	rm -f /usr/local/bin/temper
+	rm -f /usr/local/bin/aprstemper
