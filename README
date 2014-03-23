@@ -1,4 +1,5 @@
-A command line sensor logger for Temper1 devices
+A command line sensor logger for Temper1 devices. It turns the output data into APRS telemetry frames ready to be sent over APRS.
+
 
 Uses pcsensor.c by Michitaka Ohno, Juan Carlos Perez and Robert Kavaler
 
@@ -25,13 +26,7 @@ Install intructions (Debian / Ubuntu)
 Usage instructions
 ==================
 
-Run log.sh, you may need to run this as root depending on your udev rules, i.e.
-
-    sudo ./log.sh
-
-This will log the temperature every 5 seconds to stdout as a CSV stream which 
-you can pipe to a text stream and open in your favourite spreadsheet package 
-later. 
+TODO
 
 
 To allow non-root users access
