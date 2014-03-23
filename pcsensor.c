@@ -1,8 +1,14 @@
 /*
+ * based on pcsensor.c by Michitaka Ohno and updatede to deal with negative temperatures
+ * using changes presented by Torbjørn Hergum in the temper1  
  * pcsensor.c by Michitaka Ohno (c) 2011 (elpeo@mars.dti.ne.jp)
  * based oc pcsensor.c by Juan Carlos Perez (c) 2011 (cray@isp-sl.com)
  * based on Temper.c by Robert Kavaler (c) 2009 (relavak.com)
  * All rights reserved.
+ *
+ * Temper driver for linux. This program can be compiled either as a library
+ * or as a standalone program (-DUNIT_TEST). The driver will work with some
+ * TEMPer usb devices from RDing (www.PCsensor.com).
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -22,19 +28,27 @@
  * 
  */
 
-#include "pcsensor.h"
+
+
+#include <usb.h>
+#include <stdio.h>
+
+#include <string.h>
+#include <errno.h>
+#include <float.h>
+ 
  
 #define INTERFACE1 (0x00)
 #define INTERFACE2 (0x01)
 #define SUPPORTED_DEVICES (2)
-
+ 
 const static unsigned short vendor_id[] = { 
-	0x1130,
-	0x0c45
+0x1130,
+0x0c45
 };
 const static unsigned short product_id[] = { 
-	0x660c,
-	0x7401
+0x660c,
+0x7401
 };
 
 const static char uTemperatura[] = { 0x01, 0x80, 0x33, 0x01, 0x00, 0x00, 0x00, 0x00 };
@@ -57,10 +71,10 @@ static int device_type(usb_dev_handle *lvr_winusb){
 	int i;
 	dev = usb_device(lvr_winusb);
 	for(i =0;i < SUPPORTED_DEVICES;i++){
-		if (dev->descriptor.idVendor == vendor_id[i] && 
-			dev->descriptor.idProduct == product_id[i] ) {
-			return i;
-		}
+			if (dev->descriptor.idVendor == vendor_id[i] && 
+				dev->descriptor.idProduct == product_id[i] ) {
+				return i;
+			}
 	}
 	return -1;
 }
@@ -242,7 +256,7 @@ static int interrupt_read(usb_dev_handle *dev) {
 
 static int interrupt_read_temperatura(usb_dev_handle *dev, float *tempC) {
  
-	int r,i, temperature;
+	int r,i,temperature;
 	char answer[reqIntLen];
 	bzero(answer, reqIntLen);
     
@@ -263,6 +277,18 @@ static int interrupt_read_temperatura(usb_dev_handle *dev, float *tempC) {
 	}
     
 	temperature = (answer[3] & 0xFF) + (answer[2] << 8);
+	
+	/* msb means the temperature is negative -- less than 0 Celsius -- and in 2'complement form.
+	* We can't be sure that the host uses 2's complement to store negative numbers
+	* so if the temperature is negative, we 'manually' get its magnitude
+	* by explicity getting it's 2's complement and then we return the negative of that.
+	*/
+
+		if ((answer[2] & 0x80)!=0) {
+		/* return the negative of magnitude of the temperature */
+			temperature = -((temperature ^ 0xffff)+1);
+		}
+	// end of the updates made for netgative temps
 	*tempC = temperature * (125.0 / 32000.0);
 	return 0;
 }
@@ -273,8 +299,8 @@ static int get_data(usb_dev_handle *dev, char *buf, int len){
 
 static int get_temperature(usb_dev_handle *dev, float *tempC){
 	char buf[256];
-	int ret, temperature, i;
-
+	int ret,i,temperature;
+	
 	control_transfer(dev, uCmd1 );
 	control_transfer(dev, uCmd4 );
 	for(i = 0; i < 7; i++) {
@@ -286,7 +312,22 @@ static int get_temperature(usb_dev_handle *dev, float *tempC){
 		return -1;
 	}
 
-	temperature = (buf[1] & 0xFF) + (buf[0] << 8);	
+	temperature = (buf[1] & 0xFF) + (buf[0] << 8);
+	
+		
+	/* msb means the temperature is negative -- less than 0 Celsius -- and in 2'complement form.
+	* We can't be sure that the host uses 2's complement to store negative numbers
+	* so if the temperature is negative, we 'manually' get its magnitude
+	* by explicity getting it's 2's complement and then we return the negative of that.
+	*/
+
+		if ((buf[0] & 0x80)!=0) {
+		/* return the negative of magnitude of the temperature */
+			temperature = -((temperature ^ 0xffff)+1);
+		}
+		
+	// end up the updates made.
+			
 	*tempC = temperature * (125.0 / 32000.0);
 	return 0;
 }
@@ -318,10 +359,7 @@ usb_dev_handle* pcsensor_open(){
 		}
 		break;
 	case 1:
-		if (ini_control_transfer(lvr_winusb) < 0) {
-			fprintf(stderr, "Failed to ini_control_transfer (device_type 1)");
-			return NULL;
-		}
+		ini_control_transfer(lvr_winusb);
       
 		control_transfer(lvr_winusb, uTemperatura );
 		interrupt_read(lvr_winusb);
@@ -366,3 +404,15 @@ float pcsensor_get_temperature(usb_dev_handle* lvr_winusb){
 	return tempc;
 }
 
+#ifdef UNIT_TEST
+
+int main(){
+	usb_dev_handle* lvr_winusb = pcsensor_open();
+	if(!lvr_winusb) return -1;
+	float tempc = pcsensor_get_temperature(lvr_winusb);
+	pcsensor_close(lvr_winusb);
+	printf("tempc=%f\n", tempc);
+	return 0;
+}
+
+#endif
