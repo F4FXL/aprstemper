@@ -32,7 +32,7 @@ TODO
 To allow non-root users access
 ==============================
 
-1. Add the udev rule set in /etc/udev/rules.d/ using the 60-temper.rules 
+1. Add the udev rule set in /etc/udev/rules.d/ using the 60-temper.rules i.e.: copy the 60-temper.rules file to /etc/udev/rules.d/
 
 2. Add a 'temper' group (using groupadd or edit the /etc/group file)
 
@@ -40,7 +40,7 @@ To allow non-root users access
 
 4. Reload the udev rules 
 
-    udevcontrol reload_rules
+    sudo udevadm control --reload-rules
 
 5. Unplug and replug the TEMPer device
 
