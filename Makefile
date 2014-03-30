@@ -1,4 +1,4 @@
-# Makefile for temperature reader
+# Makefile for aprs temperature reader
 CC=gcc
 CFLAGS=-Wall
 
