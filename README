@@ -43,7 +43,3 @@ To allow non-root users access
     sudo udevadm control --reload-rules
 
 5. Unplug and replug the TEMPer device
-
-
-
-
