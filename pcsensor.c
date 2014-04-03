@@ -131,8 +131,8 @@ static usb_dev_handle *find_lvr_winusb()
         {
             for(i =0; i < SUPPORTED_DEVICES; i++)
             {
-                if (dev->descriptor.idVendor == vendor_id[i] &&
-                        dev->descriptor.idProduct == product_id[i] )
+                if (dev->descriptor.idVendor == vendor_id[i]
+                    && dev->descriptor.idProduct == product_id[i] )
                 {
                     usb_dev_handle *handle;
                     if(debug)
@@ -240,7 +240,9 @@ static int ini_control_transfer(usb_dev_handle *dev)
 
     if(debug)
     {
-        for (i=0; i<reqIntLen; i++) printf("%02x ",question[i] & 0xFF);
+        for (i=0; i<reqIntLen; i++)
+            printf("%02x ",question[i] & 0xFF);
+
         printf("\n");
     }
     return 0;
@@ -468,16 +470,4 @@ float pcsensor_get_temperature(usb_dev_handle* lvr_winusb)
     return tempc;
 }
 
-#ifdef UNIT_TEST
 
-int main()
-{
-    usb_dev_handle* lvr_winusb = pcsensor_open();
-    if(!lvr_winusb) return -1;
-    float tempc = pcsensor_get_temperature(lvr_winusb);
-    pcsensor_close(lvr_winusb);
-    printf("tempc=%f\n", tempc);
-    return 0;
-}
-
-#endif

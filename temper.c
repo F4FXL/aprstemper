@@ -3,16 +3,129 @@
  *
  */
 
+#include <ctype.h>
 #include <stdio.h>
-#include <time.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "temper.h"
 #include "pcsensor.h"
+
+#define SEQFILE "/tmp/aprsTemperSequence"
 
 /* Calibration adjustments */
 /* See http://www.pitt-pladdy.com/blog/_20110824-191017_0100_TEMPer_under_Linux_perl_with_Cacti/ */
 static float scale = 1.0287;
 static float offset = -0.85;
 
-int main()
+int main(int argc, char **argv)
+{
+    char optChar;
+    BOOL label = FALSE;
+    BOOL unit = FALSE;
+    BOOL eq = FALSE;
+    BOOL telem = FALSE;
+    BOOL status = FALSE;
+    char * callSign = NULL;
+
+    while((optChar = getopt (argc, argv, "luetsc:")) != -1)
+    {
+        switch(optChar)
+        {
+        case 'l':
+            label = TRUE;
+            break;
+        case 'u' :
+            unit = TRUE;
+            break;
+        case 'e':
+            eq = TRUE;
+        case 't':
+            telem = TRUE;
+            break;
+        case 's':
+            status = TRUE;
+            break;
+        case 'c':
+            callSign = optarg;
+            break;
+        default:
+            return 1;
+        }
+    }
+
+    if(callSign == NULL)//no callsign specified, exit
+        return 1;
+
+    if(label)
+        print_labels(callSign);
+    if(unit)
+        print_units(callSign);
+    if(eq)
+        print_equation(callSign);
+    if(telem)
+        print_telemetry();
+
+    return 0;
+}
+
+void print_labels(char * callSign)
+{
+    printf(":%-9s:PARM.PA Temp\n", callSign);
+    fflush(stdout);
+}
+
+void print_units(char * callSign)
+{
+    printf(":%-9s:UNIT.deg.C\n", callSign);
+    fflush(stdout);
+}
+
+void print_equation(char * callSign)
+{
+    printf(":%-9s:EQNS.0,1,-40\n", callSign);
+    fflush(stdout);
+}
+
+void print_telemetry(void)
+{
+    int seq;
+    float temp;
+
+    if(!read_temp(&temp))
+    {
+        seq = get_telemetry_sequence();
+
+        printf("T#%03d,%d\n", seq, (int)(temp + 40));//since aprs specs says datas is unsigned ad 40 to it, the 40 will substracted by listeners using EQNS
+        fflush(stdout);
+    }
+}
+
+int get_telemetry_sequence(void)
+{
+    int seq = 0;
+    FILE * fileds = fopen(SEQFILE, "rb");
+    if(fileds)
+    {
+        fread(&seq, sizeof(int), 1, fileds);
+        fclose(fileds);
+    }
+
+    seq++;
+
+    if(seq > 999)
+        seq = 1;
+
+    fileds = fopen(SEQFILE, "wb");
+    if(fileds)
+    {
+        fwrite(&seq, sizeof(int), 1, fileds);
+        fclose(fileds);
+    }
+
+    return seq;
+}
+
+int read_temp(float * temp)
 {
     int passes = 0;
     float tempc = 0.0000;
@@ -42,17 +155,7 @@ int main()
     {
         /* Apply calibrations */
         tempc = (tempc * scale) + offset;
-
-        struct tm *utc;
-        time_t t;
-        t = time(NULL);
-        utc = gmtime(&t);
-
-        char dt[80];
-        strftime(dt, 80, "%d-%b-%Y %H:%M", utc);
-
-        printf("%s,%f\n", dt, tempc);
-        fflush(stdout);
+        *temp = tempc;
 
         return 0;
     }
@@ -60,5 +163,4 @@ int main()
     {
         return 1;
     }
-
 }
