@@ -65,6 +65,8 @@ int main(int argc, char **argv)
         print_equation(callSign);
     if(telem)
         print_telemetry();
+    if(status)
+        print_status();
 
     return 0;
 }
@@ -85,6 +87,16 @@ void print_equation(char * callSign)
 {
     printf(":%-9s:EQNS.0,1,-40,0,0,0,0,0,0,0,0,0,0,0,0\n", callSign);
     fflush(stdout);
+}
+
+void print_status(char * callSign)
+{
+    float temp;
+    if(!read_temp(&temp))
+    {
+        printf(">PA Temperature : %.1f", temp);
+        fflush(stdout);
+    }
 }
 
 void print_telemetry(void)
