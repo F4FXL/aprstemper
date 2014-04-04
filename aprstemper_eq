@@ -1,0 +1,3 @@
+#! /bin/sh
+/root/aprstemper/aprstemper -ec F4FXL-2
+
