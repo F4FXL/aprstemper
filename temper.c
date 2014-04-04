@@ -94,7 +94,7 @@ void print_status()
     float temp;
     if(!read_temp(&temp))
     {
-        printf(">PA Temperature : %.1f", temp);
+        printf(">PA Temperature : %.1f\n", temp);
         fflush(stdout);
     }
 }
