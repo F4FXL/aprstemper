@@ -96,7 +96,7 @@ void print_telemetry(void)
     {
         seq = get_telemetry_sequence();
 
-        printf("T#%03d,%d\n", seq, (int)(temp + 40));//since aprs specs says datas is unsigned ad 40 to it, the 40 will substracted by listeners using EQNS
+        printf("T#%03d,%d,000,000,000,000,00000000\n", seq, (int)(temp + 40));//since aprs specs says datas is unsigned ad 40 to it, the 40 will substracted by listeners using EQNS
         fflush(stdout);
     }
 }
