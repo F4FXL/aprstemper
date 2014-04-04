@@ -39,6 +39,7 @@ int main(int argc, char **argv)
             break;
         case 'e':
             eq = TRUE;
+            break;
         case 't':
             telem = TRUE;
             break;
