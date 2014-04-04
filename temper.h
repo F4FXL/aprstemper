@@ -15,4 +15,4 @@ void print_telemetry(void);
 
 int get_telemetry_sequence(void);
 
-void print_status(char *);
+void print_status();

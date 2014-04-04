@@ -89,7 +89,7 @@ void print_equation(char * callSign)
     fflush(stdout);
 }
 
-void print_status(char * callSign)
+void print_status()
 {
     float temp;
     if(!read_temp(&temp))
