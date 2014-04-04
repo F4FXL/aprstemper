@@ -83,7 +83,7 @@ void print_units(char * callSign)
 
 void print_equation(char * callSign)
 {
-    printf(":%-9s:EQNS.0,1,-40\n", callSign);
+    printf(":%-9s:EQNS.0,1,-40,0,0,0,0,0,0,0,0,0,0,0,0\n", callSign);
     fflush(stdout);
 }
 
