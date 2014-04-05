@@ -85,7 +85,7 @@ void print_units(char * callSign)
 
 void print_equation(char * callSign)
 {
-    printf(":%-9s:EQNS.0,1,-40,0,0,0,0,0,0,0,0,0,0,0,0\n", callSign);
+    printf(":%-9s:EQNS.0,0.16016,-40,0,0,0,0,0,0,0,0,0,0,0,0\n", callSign);
     fflush(stdout);
 }
 
@@ -94,7 +94,7 @@ void print_status()
     float temp;
     if(!read_temp(&temp))
     {
-        printf(">PA Temperature : %.1f\n", temp);
+        printf(">PA Temperature : %.1f°C\n", temp);
         fflush(stdout);
     }
 }
@@ -108,7 +108,10 @@ void print_telemetry(void)
     {
         seq = get_telemetry_sequence();
 
-        printf("T#%03d,%d,000,000,000,000,00000000\n", seq, (int)(temp + 40));//since aprs specs says datas is unsigned ad 40 to it, the 40 will substracted by listeners using EQNS
+        temp += 40;
+        temp /= 0.16016;
+
+        printf("T#%03d,%.0f,000,000,000,000,00000000\n", seq, temp);//since aprs specs says datas is unsigned ad 40 to it, the 40 will substracted by listeners using EQNS
         fflush(stdout);
     }
 }
