@@ -19,7 +19,7 @@ static float offset = -0.85;
 
 int main(int argc, char **argv)
 {
-    char optChar;
+    unsigned char optChar;
     BOOL label = FALSE;
     BOOL unit = FALSE;
     BOOL eq = FALSE;
@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     BOOL status = FALSE;
     char * callSign = NULL;
 
-    while((optChar = getopt (argc, argv, "luetsc:")) != -1)
+    while((optChar = getopt (argc, argv, "luetsc:")) != 255)
     {
         switch(optChar)
         {
