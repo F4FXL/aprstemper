@@ -1,8 +1,9 @@
 A command line sensor logger for Temper1 devices. It turns the output data into APRS telemetry frames ready to be sent over APRS.
 To be used with APRX new exec beacon format.
 
-
 Uses pcsensor.c by Michitaka Ohno, Juan Carlos Perez and Robert Kavaler
+https://github.com/elpeo/rbtemper
+https://github.com/bitplane/temper
 
 Install intructions (Debian / Ubuntu)
 =====================================
