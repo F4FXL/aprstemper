@@ -1,3 +1,4 @@
-#! /bin/sh
+#! /bin/bash
+cd "$(dirname "$0")"
 callsign=`cat callsign`
 ./aprstemper -tc $callsign
