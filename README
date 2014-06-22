@@ -29,6 +29,23 @@ Usage instructions
 
 - Prior first use edit the callsign file and put your own callsign there. Must match the src callsign configured for the beacon in APRX but must be different from the $mycall APRX callsign.
 
+Here a sample of the beacon I am using. $mycall is set to F4FXL-1, therefore to not conflict with APRX's built in telemetry we need to use another callsign.
+<beacon>
+	beaconmode both
+	cycle-size 40m
+	beacon interface $mycall srccall F4FXL-2 $myloc symbol "IA" comment "Station Temp" via WIDE2-1
+	beacon interface $mycall srccall F4FXL-2 exec "/root/aprstemper/aprstemper_labels"
+	beacon interface $mycall srccall F4FXL-2 exec "/root/aprstemper/aprstemper_eq"
+	beacon interface $mycall srccall F4FXL-2 exec "/root/aprstemper/aprstemper_units"
+</beacon>
+
+<beacon>
+	beaconmode both
+	cycle-size 5m
+	beacon interface $mycall srccall F4FXL-2 exec "/root/aprstemper/aprstemper_telem"
+	beacon interface $mycall srccall F4FXL-2 exec "/root/aprstemper/aprstemper_status"
+</beacon>
+
 
 To allow non-root users access
 ==============================
