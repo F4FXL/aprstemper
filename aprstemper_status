@@ -1,2 +1,2 @@
 #! /bin/sh
-/root/aprstemper/aprstemper -sc F4FXL-2
+./aprstemper -sc F4FXL-2
