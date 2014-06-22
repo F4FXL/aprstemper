@@ -1,2 +1,3 @@
 #! /bin/sh
-./aprstemper -tc F4FXL-2
+callsign=`cat callsign`
+./aprstemper -tc $callsign
